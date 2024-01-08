@@ -1,0 +1,62 @@
+Inicializar um projeto: cobra-cli init
+Criar comandos: cobra-cli add "texto"
+O root.go é o comando pai quando a gente 
+adiciona um novo comando ele fica dentro do root.go exemplo: rootCmd.AddCommand(pingCmd)
+Para ver se o comando está inserido: go run main.go
+Para chamar um comando chamado "teste": go run main.go teste
+
+Criar um flag: testeCmd.Flags().StringP("comando", "c", "", "Escolha ping ou pong")
+Tornar um flag obrigatória: testeCmd.MarkFlagRequired("comando")
+
+Comando encadeado, adicionando comando filho: cobra-cli add create -p "categoryCmd"
+O "create" é um comando filho de category
+
+Se colocar no comando no pai Flags os filhos vão herdar exemplo: categoryCmd.PersistentFlags().String("name", "", "Name Of Category")
+categoryCmd é o pai agora se colocar no filho não fica global fica somente para o filho
+Isso no PersistentFlags, agora se colocar só Flags não fica global: categoryCmd.Flags().String("name", "", "Name Of Category")
+
+Tipos de flags exemplo com flag string:
+
+        categoryCmd.PersistentFlags().String("name", "", "Name Of Category")
+		name, _ := cmd.Flags().GetString("name")
+		fmt.Println("Categoria chamada foi:", name)
+
+StringP tem acesso ao shorthand ou nome curto exemplo:
+
+    categoryCmd.PersistentFlags().StringP("name","n", "Y", "Name Of Category")
+Chama o parametro -n para shorthand e o "Y" é o valor default
+
+Passar valor por variável valor por referência:
+
+    var catgeory string
+
+    func init() {
+	    categoryCmd.PersistentFlags().StringVarP(&catgeory, "n", "Y", "Name Of Category")
+    } 
+Executa da mesma forma: go run main.go category -n=categoria
+Somente na chamada é diferente:
+f   mt.Println("Categoria chamada foi:", catgeory)
+
+
+Hooks:
+
+	Run: func(cmd *cobra.Command, args []string) {
+		// name, _ := cmd.Flags().GetString("name")
+		fmt.Println("Categoria chamada foi:", catgeory)
+		exists, _ := cmd.Flags().GetBool("exists")
+		fmt.Println("Categoria chamada com existe:", exists)
+		id, _ := cmd.Flags().GetInt16("id")
+		fmt.Println("id da Categoria:", id)
+
+	},
+	PreRun: func(cmd *cobra.Command, args []string) {
+		println("Chamado antes do run")
+	}, PostRun: func(cmd *cobra.Command, args []string) {
+		println("Chamado depois do run")
+	},
+RunE: Uma outra forma de fazer um run. Ele retorna um erro exemplo:
+
+    RunE: func(cmd *cobra.Command, args []string) error {
+		return fmt.Errorf("Error")
+	},
+Existe também o PostRunE e PreRunE
